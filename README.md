@@ -214,3 +214,7 @@ This agent can fit into a real virtual screening pipeline as follows:
 - `POST /api/query` - Process molecular queries
 - `GET /api/health` - Health check
 - `GET /` - Web interface
+
+# Linux demo with real docking calculation
+[DEMO](https://github.com/user-attachments/assets/8ea399f9-5d9b-4c53-8f94-8c6f263873d2)
+
