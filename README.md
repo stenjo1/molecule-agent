@@ -218,3 +218,8 @@ This agent can fit into a real virtual screening pipeline as follows:
 # Linux demo with real docking calculation
 [DEMO](https://github.com/user-attachments/assets/8ea399f9-5d9b-4c53-8f94-8c6f263873d2)
 
+# Lucidchart Diagram
+<img width="4629" height="1070" alt="Blank diagram" src="https://github.com/user-attachments/assets/2a29b333-fc1f-4bd7-bdd4-ef3193237da0" />
+
+
+
