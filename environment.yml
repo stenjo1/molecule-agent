@@ -1,0 +1,16 @@
+name: vs-agent
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - rdkit
+  - openbabel
+  - pip
+  - pip:
+      - openai
+      - openai-agents
+      - python-dotenv
+      - flask
+      - flask-cors
+      - pydantic
+      - dockstring

@@ -1,0 +1,136 @@
+{
+  "docking_scores": {
+    "excellent": {
+      "range": "< -8.0",
+      "description": "Very strong binding, potential drug candidate",
+      "recommendation": "High priority for further development and experimental validation"
+    },
+    "good": {
+      "range": "-6.0 to -8.0", 
+      "description": "Good binding affinity, worth further investigation",
+      "recommendation": "Worth investigating further, consider lead optimization"
+    },
+    "moderate": {
+      "range": "-4.0 to -6.0",
+      "description": "Moderate binding, may need optimization", 
+      "recommendation": "May need structural modifications to improve binding"
+    },
+    "weak": {
+      "range": "> -4.0",
+      "description": "Weak binding, unlikely to be effective",
+      "recommendation": "Unlikely to be effective, consider different chemical scaffolds"
+    }
+  },
+  "targets": {
+    "HSP90AA1": {
+      "name": "Heat shock protein 90 alpha",
+      "description": "Molecular chaperone involved in protein folding and stability",
+      "drug_examples": ["Geldanamycin", "17-AAG", "Ganetespib"],
+      "binding_site": "ATP binding site in N-terminal domain",
+      "therapeutic_area": "Oncology, Neurodegenerative diseases",
+      "dockstring_id": "HSP90AA1"
+    },
+    "ACHE": {
+      "name": "Acetylcholinesterase",
+      "description": "Enzyme that breaks down acetylcholine neurotransmitter",
+      "drug_examples": ["Donepezil", "Rivastigmine", "Galantamine"],
+      "binding_site": "Catalytic site with choline binding pocket",
+      "therapeutic_area": "Alzheimer's disease, Myasthenia gravis",
+      "dockstring_id": "ACHE"
+    },
+    "EGFR": {
+      "name": "Epidermal Growth Factor Receptor",
+      "description": "Tyrosine kinase receptor involved in cell growth",
+      "drug_examples": ["Gefitinib", "Erlotinib", "Osimertinib"],
+      "binding_site": "ATP binding site", 
+      "therapeutic_area": "Oncology",
+      "dockstring_id": "EGFR"
+    },
+    "F2": {
+      "name": "Thrombin",
+      "description": "Key enzyme in blood coagulation cascade",
+      "drug_examples": ["Dabigatran", "Argatroban", "Bivalirudin"],
+      "binding_site": "Active site with specificity pocket",
+      "therapeutic_area": "Anticoagulation therapy",
+      "dockstring_id": "F2"
+    },
+    "PLK1": {
+      "name": "Protein kinase 1",
+      "description": "Serine/threonine kinase involved in cell cycle progression",
+      "drug_examples": ["Palbociclib", "Ribociclib", "Abemaciclib"],
+      "binding_site": "ATP binding site",
+      "therapeutic_area": "Oncology",
+      "dockstring_id": "PLK1"
+    },
+    "ESR1": {
+      "name": "Estrogen receptor 1",
+      "description": "Steroid receptor involved in estrogen signaling",
+      "drug_examples": ["Tamoxifen", "Fulvestrant", "Aromatase inhibitors"],
+      "binding_site": "Estrogen response element",
+      "therapeutic_area": "Oncology",
+      "dockstring_id": "ESR1"
+    }
+  },
+  "processes": {
+    "docking": {
+      "description": "Molecular docking predicts how ligands bind to protein targets by sampling different conformations and orientations",
+      "steps": [
+        "Prepare protein structure (remove water, add hydrogens)",
+        "Define binding site", 
+        "Generate ligand conformations",
+        "Score binding poses",
+        "Rank results by binding affinity"
+      ],
+      "software": ["AutoDock Vina", "Schrödinger Glide", "OpenEye FRED"]
+    },
+    "virtual_screening": {
+      "description": "High-throughput computational screening of large compound libraries against protein targets",
+      "steps": [
+        "Prepare compound library",
+        "Filter by drug-likeness",
+        "Dock compounds to target", 
+        "Score and rank results",
+        "Select hits for experimental validation"
+      ],
+      "advantages": ["Cost-effective", "Fast", "Large scale"]
+    },
+    "drug_discovery": {
+      "description": "Process of identifying, optimizing, and developing new therapeutic compounds",
+      "stages": [
+        "Target identification",
+        "Hit identification", 
+        "Lead optimization",
+        "Preclinical development",
+        "Clinical trials"
+      ],
+      "timeline": "10-15 years average"
+    }
+  },
+  "molecular_properties": {
+    "lipophilicity": {
+      "description": "Measure of how well a compound dissolves in lipids vs water",
+      "importance": "Affects membrane permeability and bioavailability", 
+      "optimal_range": "LogP 1-3"
+    },
+    "molecular_weight": {
+      "description": "Mass of the molecule",
+      "importance": "Affects drug-likeness and ADMET properties",
+      "optimal_range": "< 500 Da"
+    },
+    "polar_surface_area": {
+      "description": "Surface area of polar atoms",
+      "importance": "Predicts oral bioavailability",
+      "optimal_range": "< 140 Å²"
+    },
+    "hydrogen_bond_donors": {
+      "description": "Number of hydrogen bond donor groups",
+      "importance": "Affects membrane permeability",
+      "optimal_range": "< 5"
+    },
+    "hydrogen_bond_acceptors": {
+      "description": "Number of hydrogen bond acceptor groups", 
+      "importance": "Affects membrane permeability",
+      "optimal_range": "< 10"
+    }
+  }
+}

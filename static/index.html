@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Molecular Docking Agent</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .query-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .examples-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4a5568;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .query-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .example-queries {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .example-query {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-query:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .example-query h4 {
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .example-query p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .response-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+        }
+
+        .response-content {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-healthy {
+            background: #38a169;
+        }
+
+        .status-error {
+            background: #e53e3e;
+        }
+
+        .drag-drop-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .drag-drop-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .molecules-pool, .targets-pool {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .pool-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+            text-align: center;
+        }
+
+        .draggable-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            margin: 8px;
+            border-radius: 8px;
+            cursor: grab;
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .draggable-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .drop-zone {
+            background: #edf2f7;
+            border: 2px dashed #a0aec0;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 120px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            background: #e6fffa;
+            border-color: #38a169;
+            border-style: solid;
+        }
+
+        .drop-zone-title {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        .dropped-item {
+            background: #38a169;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            position: relative;
+            animation: dropIn 0.3s ease;
+        }
+
+        @keyframes dropIn {
+            0% {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .remove-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-btn:hover {
+            background: #c53030;
+        }
+
+        .generate-query-btn {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .generate-query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.4);
+        }
+
+        .generate-query-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .query-preview {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        /* Chat Interface Styles */
+        .chat-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f7fafc;
+            max-height: 600px;
+            min-height: 500px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.assistant {
+            background: #e2e8f0;
+            color: #2d3748;
+            margin-right: auto;
+        }
+
+        .message-content {
+            line-height: 1.5;
+        }
+
+        .message-content h1, .message-content h2, .message-content h3 {
+            margin: 8px 0 4px 0;
+            color: inherit;
+        }
+
+        .message-content ul, .message-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .message-content li {
+            margin: 4px 0;
+        }
+
+        .message-content strong {
+            font-weight: 600;
+        }
+
+        .message-content code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .message-content pre {
+            background: rgba(0,0,0,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 60px;
+            max-height: 150px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 60px;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .proposed-questions {
+            margin-top: 20px;
+            padding-bottom: 10px;
+        }
+
+        .proposed-question {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .proposed-question:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            margin-right: auto;
+            max-width: 80px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #718096;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .drag-drop-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .draggable-item {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            
+            .drop-zone {
+                min-height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 Molecular Docking Agent</h1>
+            <p>Intelligent molecular analysis powered by AI</p>
+            <div id="api-status" style="margin-top: 15px;">
+                <span class="status-indicator status-error"></span>
+                <span>Checking API connection...</span>
+            </div>
+        </div>
+
+        <!-- Drag and Drop Section -->
+        <div class="drag-drop-section">
+            <h2 class="section-title">🎯 Drag & Drop Query Builder</h2>
+            <p style="text-align: center; color: #718096; margin-bottom: 30px;">
+                Drag molecules and targets to build your docking query interactively!
+            </p>
+            
+            <div class="drag-drop-container">
+                <div class="molecules-pool">
+                    <div class="pool-title">🧬 Available Molecules</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="CCO">CCO (Ethanol)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="CCN">CCN (Ethylamine)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="CCC">CCC (Propane)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="O=C(C)Oc1ccccc1C(=O)O">O=C(C)Oc1ccccc1C(=O)O (Aspirin)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="C#C">C#C (Acetylene)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="NC(C)Cc1ccccc1">NC(C)Cc1ccccc1 (Amphetamine)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="O=C(O)C[C@H](N)C(=O)N[C@H](C(=O)OC)Cc1ccccc1">O=C(O)C[C@H](N)C(=O)N[C@H](C(=O)OC)Cc1ccccc1 (Aspartame)</div>
+                    <div class="draggable-item" draggable="true" data-type="molecule" data-value="C([C@@H]([C@@H]1C(=C(C(=O)O1)O)O)O)O">C([C@@H]([C@@H]1C(=C(C(=O)O1)O)O)O)O (Vitamin C)</div>
+                </div>
+                
+                <div class="targets-pool">
+                    <div class="pool-title">🎯 Available Targets</div>
+                    <div class="draggable-item" draggable="true" data-type="target" data-value="ESR1">ESR1 (Estrogen Receptor)</div>
+                    <div class="draggable-item" draggable="true" data-type="target" data-value="EGFR">EGFR (EGFR Kinase)</div>
+                    <div class="draggable-item" draggable="true" data-type="target" data-value="ACHE">ACHE (Acetylcholinesterase)</div>
+                    <div class="draggable-item" draggable="true" data-type="target" data-value="PLK1">PLK1 (Polo-like Kinase 1)</div>
+                    <div class="draggable-item" draggable="true" data-type="target" data-value="HSP90AA1">HSP90AA1 (Heat Shock Protein 90)</div>
+                    <div class="draggable-item" draggable="true" data-type="target" data-value="F2">F2 (Thrombin)</div>
+                </div>
+            </div>
+            
+            <div class="drop-zone" id="moleculesDropZone">
+                <div class="drop-zone-title">Drop Molecules Here</div>
+                <div class="drop-zone-content" id="moleculesContent"></div>
+            </div>
+            
+            <div class="drop-zone" id="targetsDropZone">
+                <div class="drop-zone-title">Drop Target Here</div>
+                <div class="drop-zone-content" id="targetsContent"></div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="generate-query-btn" id="generateQueryBtn" disabled>
+                    Generate Query
+                </button>
+            </div>
+            
+            <div class="query-preview" id="queryPreview" style="display: none;">
+                <strong>Generated Query:</strong><br>
+                <span id="previewText"></span>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <h2 class="section-title">💬 Chat with Molecular Agent</h2>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    <div class="message-content">
+                        👋 Hello! I'm your molecular docking assistant. I can help you:
+                        <ul>
+                            <li>Rank molecules by docking scores</li>
+                            <li>Compare compounds against targets</li>
+                            <li>Explain docking concepts</li>
+                            <li>Analyze binding affinities</li>
+                        </ul>
+                        Try asking me something or use the drag-and-drop builder above!
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <textarea 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Ask me about molecular docking..."
+                    rows="1"
+                ></textarea>
+                <button class="chat-send-btn" id="chatSendBtn">
+                    Send
+                </button>
+            </div>
+
+            <div class="proposed-questions">
+                <h3 style="margin-bottom: 15px; color: #4a5568;">💡 Suggested Questions:</h3>
+                <div class="proposed-question" onclick="sendProposedQuestion('Rank molecules CCO, CCN, CCC by docking score against target F2')">
+                    🏆 Rank molecules CCO, CCN, CCC by docking score against target F2
+                </div>
+                <div class="proposed-question" onclick="sendProposedQuestion('What does a docking score of -7.5 mean?')">
+                    📊 What does a docking score of -7.5 mean?
+                </div>
+                <div class="proposed-question" onclick="sendProposedQuestion('Explain molecular docking')">
+                    🧪 Explain molecular docking
+                </div>
+                <div class="proposed-question" onclick="sendProposedQuestion('Tell me about target ACE2')">
+                    🎯 Tell me about target ACE2
+                </div>
+                <div class="proposed-question" onclick="sendProposedQuestion('Compare O=C(C)Oc1ccccc1C(=O)O and NC(C)Cc1ccccc1 against EGFR')">
+                    ⚖️ Compare Aspirin and Amphetamine against EGFR
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        
+        // Drag and drop state
+        let selectedMolecules = [];
+        let selectedTarget = null;
+        
+        // Check API health on page load
+        async function checkApiHealth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('api-status');
+                if (data.status === 'healthy') {
+                    statusElement.innerHTML = '<span class="status-indicator status-healthy"></span><span>API Connected</span>';
+                } else {
+                    statusElement.innerHTML = '<span class="status-indicator status-error"></span><span>API Error</span>';
+                }
+            } catch (error) {
+                const statusElement = document.getElementById('api-status');
+                statusElement.innerHTML = '<span class="status-indicator status-error"></span><span>API Offline</span>';
+            }
+        }
+
+        // Chat functionality
+        function addMessage(content, isUser = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (isUser) {
+                contentDiv.textContent = content;
+            } else {
+                // Render markdown for assistant messages
+                contentDiv.innerHTML = marked.parse(content);
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            typingDiv.style.display = 'block';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            const query = chatInput.value.trim();
+            
+            if (!query) return;
+
+            // Add user message
+            addMessage(query, true);
+            chatInput.value = '';
+            chatSendBtn.disabled = true;
+            chatSendBtn.textContent = 'Sending...';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+
+                // Hide typing indicator
+                hideTypingIndicator();
+
+                if (data.status === 'success') {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage(`Error: ${data.error}`, false);
+                }
+
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage(`Network Error: ${error.message}`, false);
+            } finally {
+                chatSendBtn.disabled = false;
+                chatSendBtn.textContent = 'Send';
+            }
+        }
+
+        function sendProposedQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        // Set query from drag-and-drop (for compatibility)
+        function setQuery(query) {
+            document.getElementById('chatInput').value = query;
+            document.getElementById('chatInput').focus();
+        }
+
+        // Drag and Drop functionality
+        function initializeDragAndDrop() {
+            const draggableItems = document.querySelectorAll('.draggable-item');
+            const moleculesDropZone = document.getElementById('moleculesDropZone');
+            const targetsDropZone = document.getElementById('targetsDropZone');
+            
+            // Add drag event listeners to draggable items
+            draggableItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // Add drop event listeners to drop zones
+            moleculesDropZone.addEventListener('dragover', handleDragOver);
+            moleculesDropZone.addEventListener('drop', handleMoleculesDrop);
+            moleculesDropZone.addEventListener('dragenter', handleDragEnter);
+            moleculesDropZone.addEventListener('dragleave', handleDragLeave);
+            
+            targetsDropZone.addEventListener('dragover', handleDragOver);
+            targetsDropZone.addEventListener('drop', handleTargetsDrop);
+            targetsDropZone.addEventListener('dragenter', handleDragEnter);
+            targetsDropZone.addEventListener('dragleave', handleDragLeave);
+        }
+        
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                type: e.target.dataset.type,
+                value: e.target.dataset.value,
+                text: e.target.textContent
+            }));
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+        
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+        
+        function handleMoleculesDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            if (data.type === 'molecule') {
+                if (!selectedMolecules.includes(data.value)) {
+                    selectedMolecules.push(data.value);
+                    updateMoleculesDisplay();
+                    updateGenerateButton();
+                }
+            }
+        }
+        
+        function handleTargetsDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            if (data.type === 'target') {
+                selectedTarget = data.value;
+                updateTargetsDisplay();
+                updateGenerateButton();
+            }
+        }
+        
+        function updateMoleculesDisplay() {
+            const content = document.getElementById('moleculesContent');
+            content.innerHTML = '';
+            
+            selectedMolecules.forEach(molecule => {
+                const item = document.createElement('div');
+                item.className = 'dropped-item';
+                item.innerHTML = `${molecule} <button class="remove-btn" onclick="removeMolecule('${molecule}')">×</button>`;
+                content.appendChild(item);
+            });
+        }
+        
+        function updateTargetsDisplay() {
+            const content = document.getElementById('targetsContent');
+            content.innerHTML = '';
+            
+            if (selectedTarget) {
+                const item = document.createElement('div');
+                item.className = 'dropped-item';
+                item.innerHTML = `${selectedTarget} <button class="remove-btn" onclick="removeTarget()">×</button>`;
+                content.appendChild(item);
+            }
+        }
+        
+        function removeMolecule(molecule) {
+            selectedMolecules = selectedMolecules.filter(m => m !== molecule);
+            updateMoleculesDisplay();
+            updateGenerateButton();
+        }
+        
+        function removeTarget() {
+            selectedTarget = null;
+            updateTargetsDisplay();
+            updateGenerateButton();
+        }
+        
+        function updateGenerateButton() {
+            const btn = document.getElementById('generateQueryBtn');
+            const preview = document.getElementById('queryPreview');
+            
+            if (selectedMolecules.length > 0 && selectedTarget) {
+                btn.disabled = false;
+                generateQueryPreview();
+                preview.style.display = 'block';
+            } else {
+                btn.disabled = true;
+                preview.style.display = 'none';
+            }
+        }
+        
+        function generateQueryPreview() {
+            const moleculesStr = selectedMolecules.map(m => `"${m}"`).join(', ');
+            const query = `Rank molecules ${moleculesStr} by docking score against target "${selectedTarget}"`;
+            document.getElementById('previewText').textContent = query;
+        }
+        
+        function generateAndSetQuery() {
+            if (selectedMolecules.length > 0 && selectedTarget) {
+                const moleculesStr = selectedMolecules.map(m => `"${m}"`).join(', ');
+                const query = `Rank molecules ${moleculesStr} by docking score against target "${selectedTarget}"`;
+                setQuery(query);
+                
+                // Scroll to the chat input
+                document.getElementById('chatInput').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('generateQueryBtn').addEventListener('click', generateAndSetQuery);
+        document.getElementById('chatSendBtn').addEventListener('click', sendMessage);
+        
+        // Handle Enter key in chat input
+        document.getElementById('chatInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('chatInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        // Initialize
+        checkApiHealth();
+        initializeDragAndDrop();
+    </script>
+</body>
+</html>

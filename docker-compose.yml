@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  # Agent demo service
+  vs-agent-demo:
+    build: .
+    volumes:
+      - ./data:/app/data
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    command: conda run -n vs-agent python demo.py
+
+  # API server service
+  vs-agent-api:
+    build: .
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./data:/app/data
+      - ./static:/app/static
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    command: conda run -n vs-agent python api.py
+
+  vs-agent-test:
+    build: .
+    volumes:
+      - ./data:/app/data
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    command: conda run -n vs-agent python test_tools.py
