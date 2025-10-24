@@ -10,7 +10,7 @@ def test_docking_tool():
     docking_tool = DockingTool()
     
     molecules = ["CCO"]
-    target = "EGFR"
+    target = "ACHE"
     
     print(f"Computing scores for {molecules} against {target}")
     scores = docking_tool.compute_scores(molecules, target)
